@@ -47,9 +47,15 @@ we can adjust easing easily GUI panel and save it info of easing(json file),appl
     
     class ofApp : public ofBaseApp{
       public:
+      void setup();
+      void update();
+      void draw();
       
-      ~~~~~~~~~
-      ~~~~~~~~~
+              ~~~~~~~~~
+              ~~~~~~~~~
+              
+      void dragEvent(ofDragInfo dragInfo);
+      void gotMessage(ofMessage msg);
       
       void setupGui();
       void drawGui(ofEventArgs & args);
@@ -63,7 +69,67 @@ we can adjust easing easily GUI panel and save it info of easing(json file),appl
       ofxEasingGUi easing;
     };
 
-  
+> ofApp.cpp
+
+    #include "ofApp.h"
+    
+    void ofApp::setup(){
+        ~~~~~~~~~
+    }
+    
+    void ofApp::setupGui(){
+        easing.setup(100, 100, 400, 400);
+
+        ofAddListener(easing.evKeyPressed,this,&ofApp::keyPressedGui);
+        ofAddListener(easing.evKeyReleased,this,&ofApp::keyReleasedGui);
+
+        ofAddListener(easing.evMouseDragged,this,&ofApp::mouseDraggedGui);
+        ofAddListener(easing.evMousePressed,this,&ofApp::mousePressedGui);
+        ofAddListener(easing.evMouseReleased,this,&ofApp::mouseReleaseGui);
+    }
+    
+    ~~~~~~~~~
+    ~~~~~~~~~
+    ~~~~~~~~~
+    
+    void ofApp::drawGui(ofEventArgs &args){
+    
+        easing.adjustEasing(1000, 2.0f, ofGetElapsedTimef());
+    }
+    
+    void ofApp::keyPressedGui(int &key){
+
+        if(key == 'c'){
+            easing.clear();
+        }
+        if(key == 'p'){
+            if(!(easing.getPreview())){
+                easing.enablePreview();
+            }
+            else{
+                easing2.disablePreview();
+            }
+        }
+        else if(key == 'j'){
+            easing.printJsonEasingBezier("test1");
+            //        easing.printJsonEasingBezierTime("test2");
+            //        easing.printJsonEasingFloat("test3");
+            //        easing.printJsonEasingFloatTime("test4");
+        }
+    }
+    
+    void ofApp::mouseDraggedGui(ofVec2f &e){
+        easing.mouseDraggedBezier(e);
+
+    }
+    void ofApp::mousePressedGui(ofVec2f &e){
+        easing.mousePressedBezier(e);
+    }
+    void ofApp::mouseReleaseGui(ofVec2f &e){
+        easing.mouseReleasedBezier();
+    }
+            
+    
   
 
 
