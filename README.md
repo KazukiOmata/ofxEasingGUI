@@ -128,13 +128,11 @@ we can adjust easing easily GUI panel and save it info of easing(json file),appl
     void ofApp::mouseReleaseGui(ofVec2f &e){
         easing.mouseReleasedBezier();
     }
-            
-    
-  
-
 
   
 ## Documentation
+Japanese(日本語) Document is [here]()
+English Document is [here]()
 
 ## Installation
 Download or use git to clone this folder into the openFrameworks/addons/ folder.
