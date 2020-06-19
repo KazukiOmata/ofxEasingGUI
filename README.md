@@ -132,6 +132,7 @@ we can adjust easing easily GUI panel and save it info of easing(json file),appl
   
 ## Documentation
 Japanese(日本語) Document is [here]()
+
 English Document is [here]()
 
 ## Installation
@@ -149,7 +150,12 @@ To read JSON file
 
 
 ## Versioning
-This project uses Semantic Versioning, although strict adherence will only come into effect at version 1.0.0.
+latest version is v01m00
+
+previous version
+
+it is developed of_v0.10.1_osx_release macOS 10.14.6
+
 
 ## Licensing
 See [LICENSE](LICENSE).
