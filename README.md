@@ -1,1 +1,1 @@
-ofxHapImageSequence
+# ofxEasingGUI
