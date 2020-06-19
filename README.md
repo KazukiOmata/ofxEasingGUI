@@ -131,9 +131,9 @@ we can adjust easing easily GUI panel and save it info of easing(json file),appl
 
   
 ## Documentation
-Japanese(日本語) Document is [here]()
+Japanese(日本語) Document is [here](https://kazukiomata.github.io/ofxEasingGUI.github.io/)
 
-English Document is [here]()
+English Document is [here](https://kazukiomata.github.io/ofxEasingGUI.github.io/)
 
 ## Installation
 Download or use git to clone this folder into the openFrameworks/addons/ folder.
