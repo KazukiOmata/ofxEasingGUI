@@ -2,8 +2,10 @@
 //  ofxEasingGUI.hpp
 //  ofxEasingGUI01
 //
-//  Created by 小俣一希 on 2020/06/16.
+//  Created by kazuki Omata on 2020/06/22.
 //
+//  version
+//  v01m01
 
 #ifndef ofxEasingGUI_hpp
 #define ofxEasingGUI_hpp
@@ -11,6 +13,7 @@
 #include <stdio.h>
 #include "ofMain.h"
 #include "ofxJSON.h"
+#include <float.h>
 
 //easingごとに、インスタンスを作成してください。
 
@@ -49,8 +52,11 @@ private:
     
     bool bCalcMode = false;
     
-    float time;
-    bool bTime = false;
+    float adjustTime;
+    float applyTime;
+    bool bAdjustTime = false;
+    bool bApplyTime = false;
+
     //デバックlog用のベクター
     vector<float> easingArray;
     //[0] = 左下
@@ -117,11 +123,18 @@ public:
     void adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float currentTime);
     void adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float setTime,float currentTime);
     
-    float applyEasing(float setTime, float currentTime);
-    float applyEasing(ofVec2f (&bezierArray)[4], float setTime, float currentTime);
     
     float applyEasingJsonBezier(string filePath, float setTime, float currentTime);
+    float applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime);
     float applyEasingJsonFloat(string filePath, float setTime, float currentTime);
+    
+    float applyEasing(float setTime, float currentTime);
+    float applyEasing(int precision, float setTime, float currentTime);
+    float applyEasing(ofVec2f (&bezierArray)[4], float setTime, float currentTime);
+    float applyEasing(ofVec2f (&bezierArray)[4], int precision,  float setTime, float currentTime);
+
+    
+    
 
     //bezier array and graph clear
     void clear();

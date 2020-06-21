@@ -2,9 +2,10 @@
 //  ofxEasingGUI.cpp
 //  ofxEasingGUI01
 //
-//  Created by 小俣一希 on 2020/06/16.
+//  Created by 小俣一希 on 2020/06/22.
 //
-
+//  version
+//  v01m01
 #include "ofxEasingGUI.hpp"
 
 //--------------------------------------------------------------
@@ -146,11 +147,27 @@ void ofxEasingGUI::disablePreview(){
 //マウスドラッグでグラフを動かすため。引数にはマウスのXY。
 void ofxEasingGUI::mouseDraggedBezier(float mouseX, float mouseY){
     if(bCurve1 && bTouch1){
-        bezier[2] = ofVec2f(mouseX - graphX, mouseY - graphY);
+        if(mouseX > graphX + graphWidth){
+            bezier[2] = ofVec2f(graphX + graphWidth, mouseY);
+        }
+        else if(mouseX < graphX){
+            bezier[2] = ofVec2f(graphX, mouseY);
+        }
+        else{
+            bezier[2] = ofVec2f(mouseX, mouseY);
+        }
         
     }
     else if(bCurve2 && bTouch2){
-        bezier[3] = ofVec2f(mouseX - graphX, mouseY - graphY);
+        if(mouseX > graphX + graphWidth){
+            bezier[3] = ofVec2f(graphX + graphWidth, mouseY);
+        }
+        else if(mouseX < graphX){
+            bezier[3] = ofVec2f(graphX, mouseY);
+        }
+        else{
+            bezier[3] = ofVec2f(mouseX, mouseY);
+        }
         
     }
     
@@ -173,12 +190,27 @@ void ofxEasingGUI::mouseDraggedBezier(float mouseX, float mouseY){
 
 void ofxEasingGUI::mouseDraggedBezier(ofVec2f mouse){
     if(bCurve1 && bTouch1){
-        bezier[2] = ofVec2f(mouse.x, mouse.y);
+        if(mouse.x > graphX + graphWidth){
+            bezier[2] = ofVec2f(graphX + graphWidth, mouse.y);
+        }
+        else if(mouse.x < graphX){
+            bezier[2] = ofVec2f(graphX, mouse.y);
+        }
+        else{
+            bezier[2] = ofVec2f(mouse.x, mouse.y);
+        }
         
     }
     else if(bCurve2 && bTouch2){
-        bezier[3] = ofVec2f(mouse.x, mouse.y);
-        
+        if(mouse.x > graphX + graphWidth){
+            bezier[3] = ofVec2f(graphX + graphWidth, mouse.y);
+        }
+        else if(mouse.x < graphX){
+            bezier[3] = ofVec2f(graphX, mouse.y);
+        }
+        else{
+            bezier[3] = ofVec2f(mouse.x, mouse.y);
+        }
     }
     
     if(bCurve1 && !bCurve2){
@@ -200,19 +232,22 @@ void ofxEasingGUI::mouseDraggedBezier(ofVec2f mouse){
 
 //マウス押した時にグラフを動かすため。引数にはマウスのXY。
 void ofxEasingGUI::mousePressedBezier(float mouseX, float mouseY){
+    
+    float mouseRadius = 13.0f;
+    
     if(!bCurve1 && !bCurve2){
         bezier[2] = (ofVec2f(mouseX - graphX, mouseY - graphY));
         bCurve1 = true;
     }
-    else if(bCurve1 && !bCurve2){
+    else if(bCurve1 && !bCurve2 && !(abs(bezier[2].x - (mouseX - graphX)) <= mouseRadius && abs(bezier[2].y - (mouseY - graphY)) <= mouseRadius && bCurve1)){
         bezier[3] = (ofVec2f(mouseX - graphX, mouseY - graphY));
         bCurve2 = true;
     }
     
-    if(abs(bezier[2].x - (mouseX - graphX)) <= 20 && abs(bezier[2].y - (mouseY - graphY)) <= 20 && bCurve1){
+    if(abs(bezier[2].x - (mouseX - graphX)) <= mouseRadius && abs(bezier[2].y - (mouseY - graphY)) <= mouseRadius && bCurve1){
         bTouch1 = true;
     }
-    else if(abs(bezier[3].x - (mouseX - graphX)) <= 20 && abs(bezier[3].y - (mouseY - graphY)) <= 20 && bCurve2){
+    else if(abs(bezier[3].x - (mouseX - graphX)) <= mouseRadius && abs(bezier[3].y - (mouseY - graphY)) <= mouseRadius && bCurve2){
         bTouch2 =true;
     }
     
@@ -222,19 +257,22 @@ void ofxEasingGUI::mousePressedBezier(float mouseX, float mouseY){
 
 
 void ofxEasingGUI::mousePressedBezier(ofVec2f mouse){
+    
+    float mouseRadius = 13.0f;
+
     if(!bCurve1 && !bCurve2){
         bezier[2] = (ofVec2f(mouse.x, mouse.y));
         bCurve1 = true;
     }
-    else if(bCurve1 && !bCurve2){
+    else if(bCurve1 && !bCurve2 && !(abs(bezier[2].x - (mouse.x)) <= mouseRadius && abs(bezier[2].y - (mouse.y)) <= mouseRadius && bCurve1)){
         bezier[3] = (ofVec2f(mouse.x, mouse.y));
         bCurve2 = true;
     }
     
-    if(abs(bezier[2].x - (mouse.x)) <= 20 && abs(bezier[2].y - (mouse.y)) <= 20 && bCurve1){
+    if(abs(bezier[2].x - (mouse.x)) <= mouseRadius && abs(bezier[2].y - (mouse.y)) <= mouseRadius && bCurve1){
         bTouch1 = true;
     }
-    else if(abs(bezier[3].x - (mouse.x)) <= 20 && abs(bezier[3].y - (mouse.y)) <= 20 && bCurve2){
+    else if(abs(bezier[3].x - (mouse.x)) <= mouseRadius && abs(bezier[3].y - (mouse.y)) <= mouseRadius && bCurve2){
         bTouch2 =true;
     }
 }
@@ -449,9 +487,9 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
     
     draw();
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bAdjustTime){
+        adjustTime = currentTime;
+        bAdjustTime = true;
     }
     
 
@@ -462,6 +500,13 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
         
         drawBeizerPoint();
         
+        //初期化
+        ofVec2f bezierCurvePoints[precision];
+        for(int i = 0;i < precision;i++){
+            bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+        }
+        ofVec2f easingCoord;
+
         ofVec2f coordinate;
 
         //ハンドルが一つの時
@@ -477,25 +522,15 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
                 }else{
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 3, t);
                 }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
                 
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
                 
 
             }
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-            if(!bCalcMode){
-                easingCoord = calc3BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 3, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-            
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
-            
+
             
             
             
@@ -514,6 +549,8 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 4, t);
                 }
                 
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
                 
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
@@ -523,21 +560,41 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
             
             
             
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-            if(!bCalcMode){
-                easingCoord = calc4BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 4, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
             
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
             
             
         }
+        //setTime秒に設定
+        float easingTime = ofMap(currentTime, adjustTime, adjustTime + setTime, graphX, graphX+graphWidth,true);
+    
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            int indexPoint = (int)(t * (float)precision);
+            
+            if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+                
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+                
+                coordinate = bezier[1];
+                break;
+            }
+            else if(bezierCurvePoints[indexPoint].x > easingTime){
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            
+            if(t == (1.0f - 1.0f/(float)(precision))){
+                std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+                std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+                
+            }
+        }
+        
+        float normalized_x = ofMap(coordinate.x, graphX, graphX+graphWidth, 0.0f, 1.0f,true);
+        float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+        coordinate = ofVec2f(normalized_x,normalized_y);
         //プレビュー
         if(bPreview){
             ofVec2f point;
@@ -554,7 +611,7 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
         }
         
         
-        if(currentTime > setTime + time){
+        if(currentTime > setTime + adjustTime){
             //デバックlog用
             if(statusLog){
                 std::cout << "--------------------------------------" << std::endl;
@@ -585,7 +642,7 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
                 
             }
             
-            bTime = false;
+            bAdjustTime = false;
         }
         
         
@@ -614,9 +671,9 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
     draw();
 
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bAdjustTime){
+        adjustTime = currentTime;
+        bAdjustTime = true;
     }
     //初期値のままだとdrawしない
     if((bezier[2].x != 0.0f && bezier[2].y !=  0.0f) || (bezier[3].x != 0.0f && bezier[3].y != 0.0f)){
@@ -626,6 +683,14 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
 
         
         int precision = 100;
+        
+        //初期化
+        ofVec2f bezierCurvePoints[precision];
+        for(int i = 0;i < precision;i++){
+            bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+        }
+        ofVec2f easingCoord;
+        
         ofVec2f coordinate;
 
         
@@ -642,22 +707,15 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 3, t);
                 }
                 
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
+                
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
                 
             }
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-            if(!bCalcMode){
-                easingCoord = calc3BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 3, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-            
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
+           
             
             
         }
@@ -673,6 +731,9 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
                 }else{
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 4, t);
                 }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
                 
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
@@ -680,23 +741,43 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
                 
             }
             
-            
-            
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-            if(!bCalcMode){
-                easingCoord = calc4BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 4, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-            
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
-            
+
             
         }
+        
+        
+        //setTime秒に設定
+        float easingTime = ofMap(currentTime, adjustTime, adjustTime + setTime, graphX, graphX+graphWidth,true);
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            int indexPoint = (int)(t * (float)precision);
+            
+            if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+                
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+                
+                coordinate = bezier[1];
+                break;
+            }
+            else if(bezierCurvePoints[indexPoint].x > easingTime){
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            
+            if(t == (1.0f - 1.0f/(float)(precision))){
+                std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+                std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+                
+            }
+        }
+        
+        float normalized_x = ofMap(coordinate.x, graphX, graphX+graphWidth, 0.0f, 1.0f,true);
+        float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
         //プレビュー
         if(bPreview){
             ofVec2f point;
@@ -714,7 +795,7 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
         
         
         
-        if(currentTime > setTime + time){
+        if(currentTime > setTime + adjustTime){
             //デバックlog用
             if(statusLog){
                 std::cout << "--------------------------------------" << std::endl;
@@ -746,7 +827,7 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
                 
             }
             
-            bTime = false;
+            bAdjustTime = false;
         }
         
         
@@ -796,9 +877,9 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
     draw();
 
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bAdjustTime){
+        adjustTime = currentTime;
+        bAdjustTime = true;
     }
     
     //初期値のままだとdrawしない
@@ -806,6 +887,12 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
         
         
         drawBeizerPoint();
+        //初期化
+        ofVec2f bezierCurvePoints[precision];
+        for(int i = 0;i < precision;i++){
+            bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+        }
+        ofVec2f easingCoord;
         
         ofVec2f coordinate;
 
@@ -822,23 +909,14 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
                 }else{
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 3, t);
                 }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
                 
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
                 
             }
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-            if(!bCalcMode){
-                easingCoord = calc3BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 3, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
             
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
 
             
         }
@@ -855,6 +933,8 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
                 }else{
                     bezierCurvePoint = calcBezierCurveCoord(bezier, 4, t);
                 }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
                 
                 ofSetColor(skin);
                 ofDrawCircle(bezierCurvePoint, 2);
@@ -862,24 +942,40 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
                 
             }
             
-            
-            
-            //setTime秒に設定
-            float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-            ofVec2f easingCoord;
-
-            if(!bCalcMode){
-                easingCoord = calc4BezierCurveCoord(bezier, easingTime);
-            }else{
-                easingCoord = calcBezierCurveCoord(bezier, 4, easingTime);
-            }
-            float easingX_normalized = ofMap(easingCoord.x, graphX, graphWidth + graphX, 0.0f, 1.0f);
-            float easingY_normalized = ofMap(easingCoord.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-            
-            coordinate = ofVec2f(easingX_normalized, easingY_normalized);
-            
-            
         }
+        
+        //setTime秒に設定
+        float easingTime = ofMap(currentTime, adjustTime, adjustTime + setTime, graphX, graphX+graphWidth,true);
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            int indexPoint = (int)(t * (float)precision);
+            
+            if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+                
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+                
+                coordinate = bezier[1];
+                break;
+            }
+            else if(bezierCurvePoints[indexPoint].x > easingTime){
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            
+            if(t == (1.0f - 1.0f/(float)(precision))){
+                std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+                std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+                
+            }
+        }
+        
+        float normalized_x = ofMap(coordinate.x, graphX, graphX+graphWidth, 0.0f, 1.0f,true);
+        float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
         
         //プレビュー
         if(bPreview){
@@ -899,7 +995,7 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
         }
         
         
-        if(currentTime > setTime + time){
+        if(currentTime > setTime + adjustTime){
             //デバックlog用
             if(statusLog){
                 std::cout << "--------------------------------------" << std::endl;
@@ -930,7 +1026,7 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
                 easingArray.clear();
                 
             }
-            bTime = false;
+            bAdjustTime = false;
         }
         
         
@@ -1023,115 +1119,269 @@ float ofxEasingGUI::applyEasingJsonBezier(string filePath, float setTime, float 
     
     
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
     }
+    
+    
+    int precision = 100;
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
     
     ofVec2f coordinate;
     
     //ベジェのハンドルが一つなら
     if(myBezier[3].x == 0.0f && myBezier[3].y == 0.0f){
-        //setTime秒に設定
-        float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc3BezierCurveCoord(myBezier, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(myBezier, 3, easingTime);
-        }
-        
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
         
         
-        //デバックlog用
-        if(statusLog){
-            easingArray.push_back(coordinate.y);
-        }
-        
-        if(currentTime > setTime + time){
-            //デバックlog用
-            if(statusLog){
-                std::cout << "--------------------------------------" << std::endl;
-                std::cout << "easingArray = "<< std::endl;
-                string array;
-                for(int e = 0;e < easingArray.size(); e++){
-                    array += ofToString(easingArray[e]);
-                    //                    std::cout << easingArray[e] << "," << std::endl;
-                    if(easingArray[easingArray.size() - 1] != easingArray[e]){
-                        array += ',';
-                    }
-                    
-                }
-                std::cout << array << std::endl;
-                std::cout << "--------------------------------------" << std::endl;
-                easingArray.clear();
-                
-            }
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(myBezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(myBezier, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
         
         
-        return coordinate.y;
+        
     }
     
     //ハンドルが二つの時
     else{
-        //setTime秒に設定
-        float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc4BezierCurveCoord(myBezier, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(myBezier, 4, easingTime);
-        }
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
         
         
         
-        //デバックlog用
-        if(statusLog){
-            easingArray.push_back(coordinate.y);
-        }
-        
-        
-        
-        if(currentTime > setTime + time){
-            //デバックlog用
-            if(statusLog){
-                std::cout << "--------------------------------------" << std::endl;
-                std::cout << "easingArray = "<< std::endl;
-                string array;
-                for(int e = 0;e < easingArray.size(); e++){
-                    array += ofToString(easingArray[e]);
-                    //                    std::cout << easingArray[e] << "," << std::endl;
-                    if(easingArray[easingArray.size() - 1] != easingArray[e]){
-                        array += ',';
-                    }
-                    
-                }
-                std::cout << array << std::endl;
-                std::cout << "--------------------------------------" << std::endl;
-                easingArray.clear();
-                
-            }
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(myBezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(myBezier, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
         
         
         
-        return coordinate.y;
+        
+      
 
         
     }
+    
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+            
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+    
+    
+    return coordinate.y;
+    
+}
+
+
+//jsonファイルからのbezier入力
+float ofxEasingGUI::applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime){
+    
+    //json読み込み
+    bool success = json.open(filePath);
+    //デバック・ログ表示
+    if(statusLog){
+        if(success){
+            std::cout << json.getRawString() << std::endl;
+        }
+        else{
+            std::cout << "Failed to parse JSON" << std::endl;
+            return 0.0f;
+        }
+    }
+    
+    
+    //jsonの代入
+    
+    float myGraphX = json["graphX"].asFloat();
+    float myGraphY = json["graphY"].asFloat();
+    float myGraphWidth = json["graphWidth"].asFloat();
+    float myGraphHeight = json["graphHeight"].asFloat();
+    
+    graphX = myGraphX;
+    graphY = myGraphY;
+    graphWidth = myGraphWidth;
+    graphHeight = myGraphHeight;
+    
+    ofVec2f myBezier[4];
+    
+    //jsonからの代入
+    for(int i = 0;i < json["bezier"].size(); i++){
+        myBezier[i] = ofVec2f(json["bezier"][i]["x"].asFloat(), json["bezier"][i]["y"].asFloat());
+    }
+    
+    //    cout << "mybezier0 = " << myBezier[0] << endl;
+    //    cout << "mybezier1 = " << myBezier[1] << endl;
+    //    cout << "mybezier2 = " << myBezier[2] << endl;
+    //    cout << "mybezier3 = " << myBezier[3] << endl;
+    
+    
+    //デバック・ログ表示
+    if(statusLog){
+        std::cout << "myGrpahX = " << myGraphX << std::endl;
+        std::cout << "myGraphY = " << myGraphY << std::endl;
+        std::cout << "myGraphWidth = " << myGraphWidth << std::endl;
+        std::cout << "myGraphHeight = " << myGraphHeight << std::endl;
+    }
+    
+    
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+    }
+    
+    
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
+    
+    ofVec2f coordinate;
+    
+    //ベジェのハンドルが一つなら
+    if(myBezier[3].x == 0.0f && myBezier[3].y == 0.0f){
+        
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(myBezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(myBezier, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+        
+    }
+    
+    //ハンドルが二つの時
+    else{
+        
+        
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(myBezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(myBezier, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+        
+        
+        
+        
+        
+    }
+    
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+            
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+    
+    
+    return coordinate.y;
     
 }
 
@@ -1182,19 +1432,19 @@ float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float c
     
     
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
     }
     
-    float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f);
     int num = easingValues.size() * easingTime;
     
     
-    if(currentTime > setTime + time){
+    if(currentTime > setTime + applyTime){
         
         
-        bTime = false;
+        bApplyTime = false;
     }
     
     
@@ -1214,74 +1464,208 @@ float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float c
 
 float ofxEasingGUI::applyEasing(float setTime, float currentTime){
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
     }
     
-    float value;
+//    float value;
+    
+    int precision = 100;
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
+    
     
     ofVec2f coordinate;
 
     
-    //setTime秒に設定
-    float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
     
     //ハンドルが一つの時
     if(bezier[3].x == 0.0f && bezier[3].y == 0.0f){
-        
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc3BezierCurveCoord(bezier, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(bezier, 3, easingTime);
-        }
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
-        
-        
-        value =  coordinate.y;
-
-        
-        if(currentTime > setTime + time){
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(bezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezier, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
+
         
     }
     //ハンドルが二つの時
     else{
         
-        
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc4BezierCurveCoord(bezier, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(bezier, 4, easingTime);
-        }
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
-        
-        value =  coordinate.y;
-
-        
-        
-        if(currentTime > setTime + time){
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(bezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezier, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
+
+    
         
     }
     
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+           
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+
+    
+    return coordinate.y;
+}
+
+
+//--------------------------------------------------------------
+
+float ofxEasingGUI::applyEasing(int precision, float setTime, float currentTime){
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+    }
+    
+    //    float value;
+    
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
+    
+    
+    ofVec2f coordinate;
     
     
     
+    //ハンドルが一つの時
+    if(bezier[3].x == 0.0f && bezier[3].y == 0.0f){
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(bezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezier, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+    }
+    //ハンドルが二つの時
+    else{
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(bezier, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezier, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+        
+    }
     
-    return value;
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+            
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+    
+    
+    return coordinate.y;
 }
 
 //--------------------------------------------------------------
@@ -1289,69 +1673,108 @@ float ofxEasingGUI::applyEasing(float setTime, float currentTime){
 
 float ofxEasingGUI::applyEasing(ofVec2f (&bezierArray)[4], float setTime, float currentTime){
     //初期時間
-    if(!bTime){
-        time = currentTime;
-        bTime = true;
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
     }
     
-    float value;
-    
+    int precision = 100;
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
     ofVec2f coordinate;
     
     
-    //setTime秒に設定
-    float easingTime = ofMap(currentTime, time, time + setTime, 0.0f, 1.0f);
     
     //ハンドルが一つの時
     if(bezierArray[3].x == 0.0f && bezierArray[3].y == 0.0f){
         
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc3BezierCurveCoord(bezierArray, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(bezierArray, 3, easingTime);
-        }
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
-        
-        
-        value =  coordinate.y;
-        
-        
-        if(currentTime > setTime + time){
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(bezierArray, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezierArray, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
+        
+        
+        
+       
         
     }
     //ハンドルが二つの時
     else{
         
         
-        ofVec2f bezierCurvePoint;
-        if(!bCalcMode){
-            bezierCurvePoint = calc4BezierCurveCoord(bezierArray, easingTime);
-        }else{
-            bezierCurvePoint = calcBezierCurveCoord(bezierArray, 4, easingTime);
-        }
-        ofVec2f normalized_bezierCurvePoint;
-        normalized_bezierCurvePoint.x = ofMap(bezierCurvePoint.x, graphX, graphX + graphWidth,0.0f, 1.0f);
-        normalized_bezierCurvePoint.y = ofMap(bezierCurvePoint.y, graphY + graphHeight, graphY, 0.0f, 1.0f);
-        coordinate = normalized_bezierCurvePoint;
-        
-        value =  coordinate.y;
-        
-        
-        
-        if(currentTime > setTime + time){
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
             
-            bTime = false;
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(bezierArray, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezierArray, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
         }
+        
+        
+        
+        
+        
         
     }
-    return value;
+    
+    
+    
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+            
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+    return coordinate.y;
 
 }
 
@@ -1360,6 +1783,112 @@ float ofxEasingGUI::applyEasing(ofVec2f (&bezierArray)[4], float setTime, float 
 //--------------------------------------------------------------
 
 
+float ofxEasingGUI::applyEasing(ofVec2f (&bezierArray)[4],int precision,  float setTime, float currentTime){
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+    }
+    
+    
+    //初期化
+    ofVec2f bezierCurvePoints[precision];
+    for(int i = 0;i < precision;i++){
+        bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+    }
+    ofVec2f easingCoord;
+    ofVec2f coordinate;
+    
+    
+    
+    //ハンドルが一つの時
+    if(bezierArray[3].x == 0.0f && bezierArray[3].y == 0.0f){
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc3BezierCurveCoord(bezierArray, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezierArray, 3, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+        
+        
+        
+    }
+    //ハンドルが二つの時
+    else{
+        
+        
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            ofVec2f bezierCurvePoint;
+            
+            if(!bCalcMode){
+                bezierCurvePoint = calc4BezierCurveCoord(bezierArray, t);
+            }else{
+                bezierCurvePoint = calcBezierCurveCoord(bezierArray, 4, t);
+            }
+            int indexPoint = (int)(t * (float)precision);
+            bezierCurvePoints[indexPoint] = bezierCurvePoint;
+            
+            
+        }
+        
+        
+        
+        
+        
+        
+    }
+    
+    
+    
+    if(currentTime > setTime + applyTime){
+        
+        bApplyTime = false;
+    }
+    
+    //setTime秒に設定
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+    for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+        int indexPoint = (int)(t * (float)precision);
+        
+        if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+            
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+            
+            coordinate = bezier[1];
+            break;
+        }
+        else if(bezierCurvePoints[indexPoint].x > easingTime){
+            coordinate = bezierCurvePoints[indexPoint];
+            break;
+        }
+        
+        if(t == (1.0f - 1.0f/(float)(precision))){
+            std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+            std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+            
+        }
+    }
+    
+    float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+    float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+    coordinate = ofVec2f(normalized_x,normalized_y);
+    
+    return coordinate.y;
+    
+}
 
 
 
