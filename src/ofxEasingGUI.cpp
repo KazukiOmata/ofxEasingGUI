@@ -2,7 +2,7 @@
 //  ofxEasingGUI.cpp
 //  ofxEasingGUI01
 //
-//  Created by 小俣一希 on 2020/06/22.
+//  Created by Kazuki Omata on 2020/06/22.
 //
 //  version
 //  v01m01
