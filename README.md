@@ -150,9 +150,11 @@ To read JSON file
 
 
 ## Versioning
-latest version is v01m00
+latest version is v01m01
+Easing calculation is corrected.
 
 previous version
+v01m00 // test Uploading
 
 it is developed of_v0.10.1_osx_release macOS 10.14.6
 
