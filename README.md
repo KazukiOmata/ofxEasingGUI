@@ -153,10 +153,13 @@ To read JSON file
 latest version is v01m02
 
 //added some useful function
+
 //added example file (example_basic)
 
 previous version
+
 v01m00 // test Uploading
+
 v01m01 // Easing calculation is corrected.
 
 it is developed of_v0.10.1_osx_release macOS 10.14.6
