@@ -60,6 +60,9 @@ private:
     bool bApplyTime = false;
     
     bool bTimeLoop = true;
+    
+    bool bAnimated = false;
+    
     //デバックlog用のベクター
     vector<float> easingArray;
     //[0] = 左下
@@ -104,6 +107,8 @@ public:
     void getBezierHandle(ofVec2f (&bezierHandleArray)[2]);
     bool getPreview();
     bool getAnimationLoop();
+    bool getBoolAnimated();
+    
 protected:
     ofVec2f calcBezierCurveProcess(ofVec2f bezierArray[], int bezierNum, float parameter);
     uintmax_t combination(unsigned int n, unsigned int r);
@@ -138,11 +143,14 @@ public:
     
     float applyEasing(float setTime, float currentTime);
     float applyEasing(int precision, float setTime, float currentTime);
+    float applyEasing(int precision, float setTime, float currentTime, float latency);
+    float applyEasing(int precision, float setTime, float currentTime, float latency, float waitTime);
     float applyEasing(ofVec2f (&bezierArray)[4], float setTime, float currentTime);
     float applyEasing(ofVec2f (&bezierArray)[4], int precision,  float setTime, float currentTime);
+    float applyEasing(ofVec2f (&bezierArray)[4], int precision,  float setTime, float currentTime, float latency);
+    float applyEasing(ofVec2f (&bezierArray)[4], int precision,  float setTime, float currentTime, float latency,float waitTime);
 
-    
-    
+    bool checkFinished();
 
     //bezier array and graph clear
     void clear();
