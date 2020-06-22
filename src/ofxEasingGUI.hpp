@@ -5,7 +5,7 @@
 //  Created by kazuki Omata on 2020/06/22.
 //
 //  version
-//  v01m01
+//  v01m02
 
 #ifndef ofxEasingGUI_hpp
 #define ofxEasingGUI_hpp
@@ -42,6 +42,7 @@ private:
     ofColor purple = ofColor(240, 50, 200,220);
     ofColor yellow = ofColor(230, 230, 40,220);
     ofColor lightBlue = ofColor(20, 230, 200,220);
+    ofColor mainColor = ofColor(238,57,135, 240);
     
     bool bCurve1 = false;
     bool bCurve2 = false;
@@ -52,11 +53,13 @@ private:
     
     bool bCalcMode = false;
     
+    
     float adjustTime;
     float applyTime;
     bool bAdjustTime = false;
     bool bApplyTime = false;
-
+    
+    bool bTimeLoop = true;
     //デバックlog用のベクター
     vector<float> easingArray;
     //[0] = 左下
@@ -92,12 +95,15 @@ public:
     void mousePressedBezier(float mouseX, float mouseY);
     void mousePressedBezier(ofVec2f mouse);
     void mouseReleasedBezier();
+    void mousePressedRightBezier(ofVec2f mouse);
+    void mousePressedRightBezier(float mouseX, float mouseY);
 
     
     void getBezier(ofVec2f (&bezierArray)[4]);
     void getBezierBasePoint(ofVec2f (&bezierBasePointArray)[2]);
     void getBezierHandle(ofVec2f (&bezierHandleArray)[2]);
     bool getPreview();
+    bool getAnimationLoop();
 protected:
     ofVec2f calcBezierCurveProcess(ofVec2f bezierArray[], int bezierNum, float parameter);
     uintmax_t combination(unsigned int n, unsigned int r);
@@ -118,6 +124,8 @@ protected:
     void enableBezierCalcNumMode();
     void disableBezierCalcNumMode();
 public:
+    void enableAnimationLoop();
+    void disableAnimationLoop();
     
     void adjustEasing(int precision, float setTime,float currentTime);
     void adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float currentTime);
