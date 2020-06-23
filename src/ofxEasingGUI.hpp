@@ -5,7 +5,7 @@
 //  Created by kazuki Omata on 2020/06/22.
 //
 //  version
-//  v01m02
+//  v01m03
 
 #ifndef ofxEasingGUI_hpp
 #define ofxEasingGUI_hpp
@@ -139,7 +139,13 @@ public:
     
     float applyEasingJsonBezier(string filePath, float setTime, float currentTime);
     float applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime);
+    float applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime, float latency);
+    float applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime, float latency, float waitTime);
+
     float applyEasingJsonFloat(string filePath, float setTime, float currentTime);
+    float applyEasingJsonFloat(string filePath, float setTime, float currentTime, float latency);
+    float applyEasingJsonFloat(string filePath, float setTime, float currentTime, float latency, float waitTime);
+
     
     float applyEasing(float setTime, float currentTime);
     float applyEasing(int precision, float setTime, float currentTime);
@@ -162,13 +168,14 @@ public:
     
     
     //JSON
-    void printJsonEasingBezier(string fileName);
-    void printJsonEasingBezierTime(string fileName);
+    void exportJsonEasingBezier(string fileName);
+    void exportJsonEasingBezierTime(string fileName);
 
-    void printJsonEasingFloat(string fileName);
-    void printJsonEasingFloatTime(string fileName);
+    void exportJsonEasingFloat(string fileName);
+    void exportJsonEasingFloatTime(string fileName);
     
 protected:
+    void createJsonFile(string fileName);
     void printJsonEasingFloatProcess(vector<float> normalizedValues);
     void printJsonEasingFloatTimePrcess(vector<float> normalizedValues);
     

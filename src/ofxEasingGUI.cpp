@@ -5,7 +5,7 @@
 //  Created by Kazuki Omata on 2020/06/22.
 //
 //  version
-//  v01m02
+//  v01m03
 #include "ofxEasingGUI.hpp"
 
 //--------------------------------------------------------------
@@ -688,11 +688,12 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
             else if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
+                    bJsonFloat = false;
                     
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -749,11 +750,12 @@ void ofxEasingGUI::adjustEasing(int precision, float setTime,float currentTime){
             if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
+                    bJsonFloat = false;
                     
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -923,11 +925,11 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
             else if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
-                    
+                    bJsonFloat = false;
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -1003,11 +1005,11 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4], float setTime,float c
             if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
-                    
+                    bJsonFloat = false;
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -1182,11 +1184,11 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
             else if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
-                    
+                    bJsonFloat =false;
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -1263,11 +1265,11 @@ void ofxEasingGUI::adjustEasing(ofVec2f (&bezierArray)[4] , int precision, float
             if(bJsonFloatTime || bJsonFloat){
                 if(bJsonFloat){
                     printJsonEasingFloatProcess(easingArray);
-                    
+                    bJsonFloat = false;
                 }
                 else if(bJsonFloatTime){
                     printJsonEasingFloatTimePrcess(easingArray);
-                    
+                    bJsonFloatTime = false;
                 }
                 easingArray.clear();
                 
@@ -1674,6 +1676,389 @@ float ofxEasingGUI::applyEasingJsonBezier(string filePath,int precision, float s
     
 }
 
+//--------------------------------------------------------------
+
+
+float ofxEasingGUI::applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime, float latency){
+    //json読み込み
+    bool success = json.open(filePath);
+    //デバック・ログ表示
+    if(statusLog){
+        if(success){
+            std::cout << json.getRawString() << std::endl;
+        }
+        else{
+            std::cout << "Failed to parse JSON" << std::endl;
+            return 0.0f;
+        }
+    }
+    
+    
+    //jsonの代入
+    
+    float myGraphX = json["graphX"].asFloat();
+    float myGraphY = json["graphY"].asFloat();
+    float myGraphWidth = json["graphWidth"].asFloat();
+    float myGraphHeight = json["graphHeight"].asFloat();
+    
+    graphX = myGraphX;
+    graphY = myGraphY;
+    graphWidth = myGraphWidth;
+    graphHeight = myGraphHeight;
+    
+    ofVec2f myBezier[4];
+    
+    //jsonからの代入
+    for(int i = 0;i < json["bezier"].size(); i++){
+        myBezier[i] = ofVec2f(json["bezier"][i]["x"].asFloat(), json["bezier"][i]["y"].asFloat());
+    }
+    
+    //    cout << "mybezier0 = " << myBezier[0] << endl;
+    //    cout << "mybezier1 = " << myBezier[1] << endl;
+    //    cout << "mybezier2 = " << myBezier[2] << endl;
+    //    cout << "mybezier3 = " << myBezier[3] << endl;
+    
+    
+    //デバック・ログ表示
+    if(statusLog){
+        std::cout << "myGrpahX = " << myGraphX << std::endl;
+        std::cout << "myGraphY = " << myGraphY << std::endl;
+        std::cout << "myGraphWidth = " << myGraphWidth << std::endl;
+        std::cout << "myGraphHeight = " << myGraphHeight << std::endl;
+    }
+    
+    
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+        bAnimated = false;
+        
+    }
+    
+    currentTime = currentTime - latency;
+    
+    ofVec2f coordinate;
+    
+    
+    if(myBezier[2].x != 0.0f && myBezier[2].y != 0.0f && myBezier[3].x != 0.0f && myBezier[3].y != 0.0f){
+        //初期化
+        ofVec2f bezierCurvePoints[precision];
+        for(int i = 0;i < precision;i++){
+            bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+        }
+        ofVec2f easingCoord;
+        
+        
+        //ベジェのハンドルが一つなら
+        if(myBezier[3].x == 0.0f && myBezier[3].y == 0.0f){
+            
+            
+            for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+                ofVec2f bezierCurvePoint;
+                
+                if(!bCalcMode){
+                    bezierCurvePoint = calc3BezierCurveCoord(myBezier, t);
+                }else{
+                    bezierCurvePoint = calcBezierCurveCoord(myBezier, 3, t);
+                }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
+                
+            }
+            
+            
+            
+        }
+        
+        //ハンドルが二つの時
+        else{
+            
+            
+            
+            for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+                ofVec2f bezierCurvePoint;
+                
+                if(!bCalcMode){
+                    bezierCurvePoint = calc4BezierCurveCoord(myBezier, t);
+                }else{
+                    bezierCurvePoint = calcBezierCurveCoord(myBezier, 4, t);
+                }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
+                
+            }
+            
+            
+            
+            
+            
+            
+            
+        }
+        
+        if(currentTime > setTime + applyTime){
+            
+            if(bTimeLoop){
+                bApplyTime = false;
+            }
+            bAnimated = true;
+            
+        }
+        
+        //setTime秒に設定
+        float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            int indexPoint = (int)(t * (float)precision);
+            
+            if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+                
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+                
+                coordinate = bezier[1];
+                break;
+            }
+            else if(bezierCurvePoints[indexPoint].x > easingTime){
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            
+            if(t == (1.0f - 1.0f/(float)(precision))){
+                std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+                std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+                
+            }
+        }
+        
+        float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+        float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
+        
+        
+        return coordinate.y;
+    }
+    else{
+        //初期値リニア
+        
+        float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f,true);
+        
+        
+        float normalized_x = easingTime;
+        float normalized_y = normalized_x;
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
+        
+        if(currentTime > setTime + applyTime){
+            
+            if(bTimeLoop){
+                bApplyTime = false;
+            }
+            bAnimated = true;
+            
+        }
+        
+        return coordinate.y;
+        
+    }
+}
+
+//--------------------------------------------------------------
+
+float ofxEasingGUI::applyEasingJsonBezier(string filePath,int precision, float setTime, float currentTime, float latency, float waitTime){
+    //json読み込み
+    bool success = json.open(filePath);
+    //デバック・ログ表示
+    if(statusLog){
+        if(success){
+            std::cout << json.getRawString() << std::endl;
+        }
+        else{
+            std::cout << "Failed to parse JSON" << std::endl;
+            return 0.0f;
+        }
+    }
+    
+    
+    //jsonの代入
+    
+    float myGraphX = json["graphX"].asFloat();
+    float myGraphY = json["graphY"].asFloat();
+    float myGraphWidth = json["graphWidth"].asFloat();
+    float myGraphHeight = json["graphHeight"].asFloat();
+    
+    graphX = myGraphX;
+    graphY = myGraphY;
+    graphWidth = myGraphWidth;
+    graphHeight = myGraphHeight;
+    
+    ofVec2f myBezier[4];
+    
+    //jsonからの代入
+    for(int i = 0;i < json["bezier"].size(); i++){
+        myBezier[i] = ofVec2f(json["bezier"][i]["x"].asFloat(), json["bezier"][i]["y"].asFloat());
+    }
+    
+    //    cout << "mybezier0 = " << myBezier[0] << endl;
+    //    cout << "mybezier1 = " << myBezier[1] << endl;
+    //    cout << "mybezier2 = " << myBezier[2] << endl;
+    //    cout << "mybezier3 = " << myBezier[3] << endl;
+    
+    
+    //デバック・ログ表示
+    if(statusLog){
+        std::cout << "myGrpahX = " << myGraphX << std::endl;
+        std::cout << "myGraphY = " << myGraphY << std::endl;
+        std::cout << "myGraphWidth = " << myGraphWidth << std::endl;
+        std::cout << "myGraphHeight = " << myGraphHeight << std::endl;
+    }
+    
+    
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+        bAnimated = false;
+        
+    }
+    
+    currentTime = currentTime - latency;
+    
+    ofVec2f coordinate;
+    
+    
+    if(myBezier[2].x != 0.0f && myBezier[2].y != 0.0f && myBezier[3].x != 0.0f && myBezier[3].y != 0.0f){
+        //初期化
+        ofVec2f bezierCurvePoints[precision];
+        for(int i = 0;i < precision;i++){
+            bezierCurvePoints[i] = ofVec2f(0.0f,0.0f);
+        }
+        ofVec2f easingCoord;
+        
+        
+        //ベジェのハンドルが一つなら
+        if(myBezier[3].x == 0.0f && myBezier[3].y == 0.0f){
+            
+            
+            for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+                ofVec2f bezierCurvePoint;
+                
+                if(!bCalcMode){
+                    bezierCurvePoint = calc3BezierCurveCoord(myBezier, t);
+                }else{
+                    bezierCurvePoint = calcBezierCurveCoord(myBezier, 3, t);
+                }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
+                
+            }
+            
+            
+            
+        }
+        
+        //ハンドルが二つの時
+        else{
+            
+            
+            
+            for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+                ofVec2f bezierCurvePoint;
+                
+                if(!bCalcMode){
+                    bezierCurvePoint = calc4BezierCurveCoord(myBezier, t);
+                }else{
+                    bezierCurvePoint = calcBezierCurveCoord(myBezier, 4, t);
+                }
+                int indexPoint = (int)(t * (float)precision);
+                bezierCurvePoints[indexPoint] = bezierCurvePoint;
+                
+                
+            }
+            
+            
+            
+            
+            
+            
+            
+        }
+        
+        if(currentTime > setTime + applyTime + waitTime){
+            
+            if(bTimeLoop){
+                bApplyTime = false;
+            }
+            bAnimated = true;
+            
+        }
+        
+        //setTime秒に設定
+        float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, graphX, graphX+graphWidth,true);
+        for(float t = 0.0f; t < 1.0f; t += 1.0f/(float)(precision)){
+            int indexPoint = (int)(t * (float)precision);
+            
+            if(fabs(bezierCurvePoints[indexPoint].x - easingTime) < FLT_EPSILON){
+                
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            else if(fabs(bezierCurvePoints[indexPoint].x - (graphX + graphWidth)) < FLT_EPSILON){
+                
+                coordinate = bezier[1];
+                break;
+            }
+            else if(bezierCurvePoints[indexPoint].x > easingTime){
+                coordinate = bezierCurvePoints[indexPoint];
+                break;
+            }
+            
+            if(t == (1.0f - 1.0f/(float)(precision))){
+                std::cout << "期待されていないbezierからの値がか出てきてます" << std::endl;
+                std::cout << "bezierCurvePoints[indexPoint].x = " << bezierCurvePoints[indexPoint].x << std::endl;
+                
+            }
+        }
+        
+        float normalized_x = ofMap(coordinate.x, graphX, graphX + graphWidth, 0.0f, 1.0f,true);
+        float normalized_y = ofMap(coordinate.y, graphY + graphHeight, graphY, 0.0f, 1.0f,true);
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
+        
+        
+        return coordinate.y;
+    }
+    else{
+        //初期値リニア
+        
+        float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f,true);
+        
+        
+        float normalized_x = easingTime;
+        float normalized_y = normalized_x;
+        coordinate = ofVec2f(normalized_x,normalized_y);
+        
+        
+        if(currentTime > setTime + applyTime + waitTime){
+            
+            if(bTimeLoop){
+                bApplyTime = false;
+            }
+            bAnimated = true;
+            
+        }
+        
+        return coordinate.y;
+        
+    }
+}
+
 
 //--------------------------------------------------------------
 
@@ -1728,7 +2113,7 @@ float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float c
 
     }
     
-    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f);
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f, true);
     int num = easingValues.size() * easingTime;
     
     
@@ -1743,7 +2128,7 @@ float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float c
     }
     
     
-    return easingValues[num];
+    return easingValues[num-1];
     
     
 
@@ -1751,7 +2136,152 @@ float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float c
     
 }
 
+//--------------------------------------------------------------
 
+float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float currentTime, float latency){
+    //json読み込み
+    bool success = json.open(filePath);
+    //デバック・ログ表示
+    if(statusLog){
+        if(success){
+            std::cout << json.getRawString() << std::endl;
+        }
+        else{
+            std::cout << "Failed to parse JSON" << std::endl;
+            return 0.0f;
+        }
+    }
+    
+    
+    //jsonの代入
+    
+    float myGraphX = json["graphX"].asFloat();
+    float myGraphY = json["graphY"].asFloat();
+    float myGraphWidth = json["graphWidth"].asFloat();
+    float myGraphHeight = json["graphHeight"].asFloat();
+    
+    graphX = myGraphX;
+    graphY = myGraphY;
+    graphWidth = myGraphWidth;
+    graphHeight = myGraphHeight;
+    
+    vector<float> easingValues;
+    
+    //jsonからの代入
+    for(int i = 0;i < json["easingValues"].size(); i++){
+        easingValues.push_back(json["easingValues"][i].asFloat());
+    }
+    
+    //デバック・ログ表示
+    if(statusLog){
+        std::cout << "myGrpahX = " << myGraphX << std::endl;
+        std::cout << "myGraphY = " << myGraphY << std::endl;
+        std::cout << "myGraphWidth = " << myGraphWidth << std::endl;
+        std::cout << "myGraphHeight = " << myGraphHeight << std::endl;
+    }
+    
+    
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+        bAnimated = false;
+        
+    }
+    
+    currentTime = currentTime - latency;
+    
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f, true);
+    int num = easingValues.size() * easingTime;
+    
+    
+    if(currentTime > setTime + applyTime){
+        
+        
+        if(bTimeLoop){
+            bApplyTime = false;
+        }
+        bAnimated = true;
+        
+    }
+    
+    
+    return easingValues[num-1];
+    
+}
+
+//--------------------------------------------------------------
+
+float ofxEasingGUI::applyEasingJsonFloat(string filePath, float setTime, float currentTime, float latency, float waitTime){
+    //json読み込み
+    bool success = json.open(filePath);
+    //デバック・ログ表示
+    if(statusLog){
+        if(success){
+            std::cout << json.getRawString() << std::endl;
+        }
+        else{
+            std::cout << "Failed to parse JSON" << std::endl;
+            return 0.0f;
+        }
+    }
+    
+    
+    //jsonの代入
+    
+    float myGraphX = json["graphX"].asFloat();
+    float myGraphY = json["graphY"].asFloat();
+    float myGraphWidth = json["graphWidth"].asFloat();
+    float myGraphHeight = json["graphHeight"].asFloat();
+    
+    graphX = myGraphX;
+    graphY = myGraphY;
+    graphWidth = myGraphWidth;
+    graphHeight = myGraphHeight;
+    
+    vector<float> easingValues;
+    
+    //jsonからの代入
+    for(int i = 0;i < json["easingValues"].size(); i++){
+        easingValues.push_back(json["easingValues"][i].asFloat());
+    }
+    
+    //デバック・ログ表示
+    if(statusLog){
+        std::cout << "myGrpahX = " << myGraphX << std::endl;
+        std::cout << "myGraphY = " << myGraphY << std::endl;
+        std::cout << "myGraphWidth = " << myGraphWidth << std::endl;
+        std::cout << "myGraphHeight = " << myGraphHeight << std::endl;
+    }
+    
+    
+    //初期時間
+    if(!bApplyTime){
+        applyTime = currentTime;
+        bApplyTime = true;
+        bAnimated = false;
+        
+    }
+    
+    currentTime = currentTime - latency;
+    
+    float easingTime = ofMap(currentTime, applyTime, applyTime + setTime, 0.0f, 1.0f, true);
+    int num = easingValues.size() * easingTime;
+    
+    
+    if(currentTime > setTime + applyTime + waitTime){
+        
+        
+        if(bTimeLoop){
+            bApplyTime = false;
+        }
+        bAnimated = true;
+        
+    }
+    
+    
+    return easingValues[num-1];
+}
 
 
 
@@ -2931,10 +3461,23 @@ void ofxEasingGUI::disableEasingLog(){
 
 
 //ベジェの4つの配列の座標をjsonに出力する
-void ofxEasingGUI::printJsonEasingBezier(string fileName){
-    ofFile newFile(ofToDataPath(fileName + ".json"), ofFile::ReadWrite); //file doesn't exist yet
-    newFile.create(); // now file doesn't exist
+void ofxEasingGUI::exportJsonEasingBezier(string fileName){
+//    ofFile newFile(ofToDataPath(fileName + ".json"), ofFile::ReadWrite); //file doesn't exist yet
+//    newFile.create(); // now file doesn't exist
+    
+    
+    createJsonFile(fileName);
+    
+//    if(ofFile::doesFileExist(ofToDataPath(fileName + ".json"))){
+//        cout << "exist" << endl;
+//    }
+//    else{
+//        cout << "no exist" << endl;
+//    }
+    
     myTextFile.open(ofToDataPath(fileName + ".json"), ofFile::ReadWrite, false);
+    myTextFile << "";
+
     
     string text = "{";
     text += "\"graphX\":" + ofToString(graphX) + ",";
@@ -2967,19 +3510,27 @@ void ofxEasingGUI::printJsonEasingBezier(string fileName){
     
     myTextFile << text;
     
-    
+    if(myTextFile.getSize() == 0){
+        exportJsonEasingBezier(fileName);
+    }
     
 }
 
 //--------------------------------------------------------------
 
 //ベジェの4つの配列の座標をjsonに出力する(file名に時間をつける)
-void ofxEasingGUI::printJsonEasingBezierTime(string fileName){
+void ofxEasingGUI::exportJsonEasingBezierTime(string fileName){
     
     string currentFileTime = ofGetTimestampString();
-    ofFile newFile(ofToDataPath(fileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite); //file doesn't exist yet
-    newFile.create(); // now file doesn't exist
+//    ofFile newFile(ofToDataPath(fileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite); //file doesn't exist yet
+//    newFile.create(); // now file doesn't exist
+//
+    createJsonFile(fileName + "_" + currentFileTime);
+    
     myTextFile.open(ofToDataPath(fileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite, false);
+    myTextFile << "";
+    
+    
     
     string text = "{";
     text += "\"graphX\":" + ofToString(graphX) + ",";
@@ -3006,12 +3557,15 @@ void ofxEasingGUI::printJsonEasingBezierTime(string fileName){
     
     myTextFile << text;
     
+//    if(myTextFile.getSize() == 0){
+//        printJsonEasingBezierTime(fileName);
+//    }
 }
 
 
 //--------------------------------------------------------------
 
-void ofxEasingGUI::printJsonEasingFloat(string fileName){
+void ofxEasingGUI::exportJsonEasingFloat(string fileName){
     bJsonFloat = true;
     jsonFileName = fileName;
 }
@@ -3019,19 +3573,35 @@ void ofxEasingGUI::printJsonEasingFloat(string fileName){
 //--------------------------------------------------------------
 
 
-void ofxEasingGUI::printJsonEasingFloatTime(string fileName){
+void ofxEasingGUI::exportJsonEasingFloatTime(string fileName){
     bJsonFloatTime = true;
     jsonFileName = fileName;
     
 }
+
+
+//--------------------------------------------------------------
+
+
+
+
+void ofxEasingGUI::createJsonFile(string fileName){
+    ofFile newFile(ofToDataPath(fileName  + ".json"), ofFile::ReadWrite); //file doesn't exist yet
+    newFile.create(); // now file doesn't exist
+}
+
 //--------------------------------------------------------------
 
 
 void ofxEasingGUI::printJsonEasingFloatProcess(vector<float> normalizedValues){
     
-    ofFile newFile(ofToDataPath(jsonFileName  + ".json"), ofFile::ReadWrite); //file doesn't exist yet
-    newFile.create(); // now file doesn't exist
+//    ofFile newFile(ofToDataPath(jsonFileName  + ".json"), ofFile::ReadWrite); //file doesn't exist yet
+//    newFile.create(); // now file doesn't exist
+    
+    createJsonFile(jsonFileName);
+    
     myTextFile.open(ofToDataPath(jsonFileName  + ".json"), ofFile::ReadWrite, false);
+    myTextFile << "";
     
     string text = "{";
     text += "\"graphX\":" + ofToString(graphX) + ",";
@@ -3056,7 +3626,13 @@ void ofxEasingGUI::printJsonEasingFloatProcess(vector<float> normalizedValues){
     
     myTextFile << text;
     
+    
+    
     bJsonFloatTime = false;
+    
+    if(myTextFile.getSize() == 0){
+        printJsonEasingFloatProcess(normalizedValues);
+    }
 }
 
 
@@ -3067,10 +3643,15 @@ void ofxEasingGUI::printJsonEasingFloatTimePrcess(vector<float> normalizedValues
     
     string currentFileTime = ofGetTimestampString();
 
-    ofFile newFile(ofToDataPath(jsonFileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite); //file doesn't exist yet
-    newFile.create(); // now file doesn't exist
-    myTextFile.open(ofToDataPath(jsonFileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite, false);
+//    ofFile newFile(ofToDataPath(jsonFileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite); //file doesn't exist yet
+//    newFile.create(); // now file doesn't exist
     
+    createJsonFile(jsonFileName + "_" + currentFileTime);
+    
+    
+    myTextFile.open(ofToDataPath(jsonFileName + "_" + currentFileTime + ".json"), ofFile::ReadWrite, false);
+    myTextFile << "";
+   
     
     string text = "{";
     text += "\"graphX\":" + ofToString(graphX) + ",";
@@ -3090,7 +3671,13 @@ void ofxEasingGUI::printJsonEasingFloatTimePrcess(vector<float> normalizedValues
     
     myTextFile << text;
     
+    
+    
     bJsonFloatTime = false;
+    
+//    if(myTextFile.getSize() == 0){
+////        printJsonEasingFloatTimePrcess(normalizedValues);
+//    }
 
 }
 
